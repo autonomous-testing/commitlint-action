@@ -1,0 +1,42 @@
+name: Commitlint
+description: Lint commit messages for compliance with Angular convention.
+
+inputs:
+  from:
+    description: "Point from which commit messages are checked."
+    required: false
+    default: "${{github.event.pull_request.base.sha}}"
+
+  to:
+    description: "Point to which commit messages are checked."
+    required: false
+    default: "${{github.event.pull_request.head.sha}}"
+
+  clean-package-dependencies:
+    description: "Delete package.json and package-lock.json to circumvent potential issues with dependency conflicts."
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Clean package dependencies
+      if: inputs.clean-package-dependencies == 'true'
+      shell: bash
+      run: rm -rf package.json package-lock.json
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        npm install --save-dev @commitlint/cli @commitlint/config-angular
+        echo "module.exports = {extends: ['@commitlint/config-angular']};" > commitlint.config.js
+
+    - name: Validate all commits from PR
+      shell: bash
+      run: npx commitlint --from ${{inputs.from}} --to ${{inputs.to}} --verbose
