@@ -34,8 +34,8 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        npm install --save-dev @commitlint/cli @commitlint/config-angular
-        echo "module.exports = {extends: ['@commitlint/config-angular']};" > commitlint.config.js
+        npm install --save-dev @commitlint/cli @commitlint/config-conventional
+        echo "module.exports = {extends: ['@commitlint/config-conventional']};" > commitlint.config.js
 
     - name: Validate all commits from PR
       shell: bash
